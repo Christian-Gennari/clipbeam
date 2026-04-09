@@ -101,6 +101,12 @@ end
 
 -- Transfer image to remote server via SSH using temp file
 local function transfer_to_remote(host, remote_path, base64_data)
+  -- 1. Extract the remote directory path in Lua (bypasses Windows/Linux path bugs completely)
+  local remote_dir = remote_path:match("^(.*)/")
+  if not remote_dir then
+    remote_dir = "."
+  end
+
   -- Generate temp file paths
   local temp_dir = os.getenv("TEMP") or os.getenv("TMP") or "/tmp"
   local timestamp = tostring(os.time())
@@ -115,27 +121,29 @@ local function transfer_to_remote(host, remote_path, base64_data)
   f:write(base64_data)
   f:close()
 
-  -- Write the PowerShell script to a .ps1 file to avoid Windows command-line quoting bugs
+  -- 2. Build a highly-simplified PS1 script using basic string concatenation
   local ps_script = string.format([[
 $tempFile = '%s'
 $sshHost = '%s'
 $remotePath = '%s'
+$remoteDir = '%s'
 
 # Replace tilde (~) with `$HOME` so it expands correctly in Bash
 $linuxPath = $remotePath -replace '^~/', "`$HOME/"
+$linuxDir = $remoteDir -replace '^~/', "`$HOME/"
 
-# We use \" to escape the inner double quotes so ssh.exe parses them correctly
-$linuxCmd = 'mkdir -p \"`$(dirname \"{0}\")\" && base64 -d > \"{0}\"' -f $linuxPath
+# Build the bash command using simple concatenation. No nested escape quotes needed!
+$linuxCmd = 'mkdir -p "' + $linuxDir + '" && base64 -d > "' + $linuxPath + '"'
 
-# Pipe via cmd.exe to stream raw bytes without PowerShell string-encoding corruption
-cmd.exe /c "type `"$tempFile`" | ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost `"$linuxCmd`""
+# Pipe the base64 string directly via SSH
+Get-Content -Raw $tempFile | ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost $linuxCmd
 
 if ($LASTEXITCODE -eq 0) {
   Write-Output "OK"
 } else {
   Write-Output "FAIL"
 }
-  ]], temp_file, host, remote_path)
+  ]], temp_file, host, remote_path, remote_dir)
 
   local ps_f, ps_err2 = io.open(ps_script_file, "w")
   if not ps_f then
@@ -145,7 +153,7 @@ if ($LASTEXITCODE -eq 0) {
   ps_f:write(ps_script)
   ps_f:close()
 
-  -- Execute the PS1 file cleanly
+  -- 3. Execute the PS1 file cleanly
   local success, stdout, stderr = wezterm.run_child_process({
     "powershell.exe",
     "-ExecutionPolicy", "Bypass",
