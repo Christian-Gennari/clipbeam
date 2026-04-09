@@ -120,11 +120,15 @@ local function transfer_to_remote(host, remote_path, base64_data)
     $sshHost = "%s"
     $remotePath = "%s"
     
-    # Command to execute natively on the remote Linux server
-    $linuxCmd = "mkdir -p `"`$(dirname '$remotePath')`" && base64 -d > '$remotePath'"
+    # 1. Replace tilde (~) with $HOME so Linux can safely expand it inside quotes
+    $linuxPath = $remotePath -replace "^~/", "$HOME/"
     
-    # Pipe using cmd.exe 'type' which safely streams bytes without string-encoding overhead
-    cmd.exe /c "type `"$tempFile`" | ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost `"$linuxCmd`""
+    # 2. Command to execute natively on the remote Linux server
+    # We use double quotes so $HOME expands correctly on the remote side
+    $linuxCmd = "mkdir -p \"$(dirname \"$linuxPath\")\" && base64 -d > \"$linuxPath\""
+    
+    # 3. Pipe using cmd.exe 'type' to stream raw bytes (bypasses PowerShell encoding corruption)
+    cmd.exe /c "type \"$tempFile\" | ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost \"$linuxCmd\""
     
     if ($LASTEXITCODE -eq 0) {
       Write-Output "OK"
