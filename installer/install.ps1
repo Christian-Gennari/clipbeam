@@ -40,7 +40,8 @@ function Test-WezTermInstalled {
     $weztermPaths = @(
         "$env:LOCALAPPDATA\Programs\WezTerm\wezterm.exe",
         "$env:ProgramFiles\WezTerm\wezterm.exe",
-        "$env:ProgramFiles(x86)\WezTerm\wezterm.exe"
+        "$env:ProgramFiles(x86)\WezTerm\wezterm.exe",
+        "C:\tools\WezTerm\wezterm.exe"
     )
     
     foreach ($path in $weztermPaths) {
@@ -49,10 +50,16 @@ function Test-WezTermInstalled {
         }
     }
     
-    # Check if in PATH
+    # Check if in PATH using where.exe (more reliable than Get-Command)
+    $whereResult = (& where.exe wezterm 2>$null)
+    if ($whereResult) {
+        return $whereResult
+    }
+    
+    # Fallback to Get-Command
     try {
-        $null = Get-Command "wezterm" -ErrorAction Stop
-        return "wezterm"
+        $cmd = Get-Command "wezterm" -ErrorAction Stop
+        return $cmd.Source
     } catch {
         return $null
     }
