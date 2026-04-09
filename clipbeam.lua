@@ -120,6 +120,7 @@ local function transfer_to_remote(host, remote_path, base64_data)
   end
   f:write(base64_data)
   f:close()
+  wezterm.log_error("clipbeam DEBUG: Wrote " .. #base64_data .. " bytes to temp file: " .. temp_file)
 
   -- 2. Build a highly-simplified PS1 script using basic string concatenation
   local ps_script = string.format([[
@@ -146,6 +147,7 @@ cmd.exe /c "ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost `"$linuxCmd`" 
   end
   ps_f:write(ps_script)
   ps_f:close()
+  wezterm.log_error("clipbeam DEBUG: Wrote PS script to: " .. ps_script_file)
 
   -- 3. Execute the PS1 file cleanly
   local success, stdout, stderr = wezterm.run_child_process({
@@ -161,13 +163,25 @@ cmd.exe /c "ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost `"$linuxCmd`" 
   os.remove(temp_file)
   os.remove(ps_script_file)
 
+  -- DEBUG: Log PowerShell execution results
+  wezterm.log_error("clipbeam DEBUG: success=" .. tostring(success))
+  wezterm.log_error("clipbeam DEBUG: stdout is nil=" .. tostring(stdout == nil))
+  wezterm.log_error("clipbeam DEBUG: stdout type=" .. type(stdout))
+  wezterm.log_error("clipbeam DEBUG: stdout length=" .. (stdout and tostring(#stdout) or "N/A"))
+  wezterm.log_error("clipbeam DEBUG: stderr is nil=" .. tostring(stderr == nil))
+  wezterm.log_error("clipbeam DEBUG: stderr=[" .. (stderr or "NIL") .. "]")
+
   if not success then
     return false, "SSH transfer failed: " .. (stderr or "unknown error")
   end
 
   -- Check if Linux explicitly reported success
-  wezterm.log_info("clipbeam stdout: [" .. stdout .. "]")  -- DEBUG: show raw stdout
-  if not stdout:match("CLIPBEAM_OK") then
+  local stdout_content = stdout or ""
+  wezterm.log_error("clipbeam DEBUG: raw stdout=[" .. stdout_content .. "]")
+  wezterm.log_error("clipbeam DEBUG: searching for CLIPBEAM_OK in stdout...")
+  local has_ok = stdout_content:match("CLIPBEAM_OK")
+  wezterm.log_error("clipbeam DEBUG: CLIPBEAM_OK found=" .. tostring(has_ok ~= nil))
+  if not has_ok then
     return false, "Failed to decode image on remote server."
   end
 
