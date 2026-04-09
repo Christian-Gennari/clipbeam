@@ -7,7 +7,7 @@
 -- Usage in your wezterm.lua:
 --   local clipbeam = require("plugins.clipbeam")
 --   local keybinding = clipbeam.setup({
---     host = "dev@omenhub",  -- required: SSH destination (user@host or alias)
+--     host = "user@myserver",  -- required: SSH destination (user@host or alias)
 --     max_dimension = 3840,   -- optional: max width/height (default: 3840 = 4K)
 --     remote_path = "~/.clipbeam/paste.png", -- optional: where to save (default: ~/.clipbeam/paste.png)
 --     copy_file_path = true,   -- optional: auto-paste path after upload (default: true)
@@ -183,7 +183,7 @@ function M.setup(opts)
   end
   
   if not opts.host then
-    error("clipbeam.setup(): 'opts.host' is required (e.g., 'dev@omenhub' or '192.168.1.50')", 2)
+    error("clipbeam.setup(): 'opts.host' is required (e.g., 'user@myserver' or '192.168.1.50')", 2)
   end
 
   -- Merge with defaults

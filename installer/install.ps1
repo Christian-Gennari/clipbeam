@@ -191,7 +191,7 @@ function Get-UserInput {
     # Get SSH host
     Write-Host "Enter your SSH destination for image uploads." -ForegroundColor White
     Write-Host "Format: user@hostname or user@IP" -ForegroundColor Gray
-    Write-Host "Example: dev@omenhub" -ForegroundColor Gray
+    Write-Host "Example: user@myserver" -ForegroundColor Gray
     
     do {
         $sshHost = Read-Host ">"
