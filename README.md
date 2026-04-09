@@ -12,7 +12,7 @@ d88' `"Y8  888  `888   888' `88b  d88' `88b d88' `88b `P  )88b  `888P"Y88bP"Y88b
 ```
 
 [![WezTerm Plugin](https://img.shields.io/badge/WezTerm-Plugin-purple)](https://wezfurlong.org/wezterm/)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20→%20Linux-blue)](https://github.com/yourusername/clipbeam)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20→%20Linux-blue)](https://github.com/christian-gennari/clipbeam)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 [![SSH Transfer](https://img.shields.io/badge/Transfer-SSH-orange)]()
 
