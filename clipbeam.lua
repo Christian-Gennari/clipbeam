@@ -132,17 +132,11 @@ $remoteDir = '%s'
 $linuxPath = $remotePath -replace '^~/', "`$HOME/"
 $linuxDir = $remoteDir -replace '^~/', "`$HOME/"
 
-# Build the bash command using simple concatenation. No nested escape quotes needed!
-$linuxCmd = 'mkdir -p "' + $linuxDir + '" && base64 -d > "' + $linuxPath + '"'
+# Make Linux print "CLIPBEAM_OK" if the directory creation and decoding succeed
+$linuxCmd = 'mkdir -p "' + $linuxDir + '" && base64 -d > "' + $linuxPath + '" && echo "CLIPBEAM_OK"'
 
-# Pipe the base64 string directly via SSH
-Get-Content -Raw $tempFile | ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost $linuxCmd
-
-if ($LASTEXITCODE -eq 0) {
-  Write-Output "OK"
-} else {
-  Write-Output "FAIL"
-}
+# Execute the command and let stdout bubble up naturally
+cmd.exe /c "ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost `"$linuxCmd`" < `"$tempFile`""
   ]], temp_file, host, remote_path, remote_dir)
 
   local ps_f, ps_err2 = io.open(ps_script_file, "w")
@@ -171,8 +165,9 @@ if ($LASTEXITCODE -eq 0) {
     return false, "SSH transfer failed: " .. (stderr or "unknown error")
   end
 
-  if not stdout:match("OK") then
-    return false, "Failed to decode image on remote server"
+  -- Check if Linux explicitly reported success
+  if not stdout:match("CLIPBEAM_OK") then
+    return false, "Failed to decode image on remote server."
   end
 
   return true, nil
