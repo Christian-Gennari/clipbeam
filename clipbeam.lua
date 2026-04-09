@@ -125,7 +125,7 @@ $remotePath = '%s'
 $linuxPath = $remotePath -replace '^~/', "`$HOME/"
 
 # We use \" to escape the inner double quotes so ssh.exe parses them correctly
-$linuxCmd = 'mkdir -p \"$(dirname \"{0}\")\" && base64 -d > \"{0}\"' -f $linuxPath
+$linuxCmd = 'mkdir -p \"`$(dirname \"{0}\")\" && base64 -d > \"{0}\"' -f $linuxPath
 
 # Pipe via cmd.exe to stream raw bytes without PowerShell string-encoding corruption
 cmd.exe /c "type `"$tempFile`" | ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost `"$linuxCmd`""
