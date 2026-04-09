@@ -166,6 +166,7 @@ cmd.exe /c "ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost `"$linuxCmd`" 
   end
 
   -- Check if Linux explicitly reported success
+  wezterm.log_info("clipbeam stdout: [" .. stdout .. "]")  -- DEBUG: show raw stdout
   if not stdout:match("CLIPBEAM_OK") then
     return false, "Failed to decode image on remote server."
   end
