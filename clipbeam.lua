@@ -99,12 +99,14 @@ local function capture_clipboard_base64(max_dimension)
   return base64_data, nil
 end
 
--- Transfer image to remote server via SSH using temp file to avoid command line length limits
+-- Transfer image to remote server via SSH using temp file
 local function transfer_to_remote(host, remote_path, base64_data)
-  -- Generate temp file path
+  -- Generate temp file paths
   local temp_dir = os.getenv("TEMP") or os.getenv("TMP") or "/tmp"
-  local temp_file = temp_dir .. "/clipbeam_" .. tostring(os.time()) .. ".b64"
-  
+  local timestamp = tostring(os.time())
+  local temp_file = temp_dir .. "/clipbeam_" .. timestamp .. ".b64"
+  local ps_script_file = temp_dir .. "/clipbeam_" .. timestamp .. ".ps1"
+
   -- Write base64 data to temp file
   local f, err = io.open(temp_file, "w")
   if not f then
@@ -112,51 +114,59 @@ local function transfer_to_remote(host, remote_path, base64_data)
   end
   f:write(base64_data)
   f:close()
-  
-  -- Use cmd.exe to pipe the file (bypasses PowerShell encoding corruption)
-  -- Delegate the directory splitting to Linux (dirname) to avoid Windows backslash issues
+
+  -- Write the PowerShell script to a .ps1 file to avoid Windows command-line quoting bugs
   local ps_script = string.format([[
-    $tempFile = "%s"
-    $sshHost = "%s"
-    $remotePath = "%s"
-    
-    # 1. Replace tilde (~) with $HOME so Linux can safely expand it inside quotes
-    $linuxPath = $remotePath -replace "^~/", "$HOME/"
-    
-    # 2. Command to execute natively on the remote Linux server
-    # We use double quotes so $HOME expands correctly on the remote side
-    $linuxCmd = "mkdir -p \"$(dirname \"$linuxPath\")\" && base64 -d > \"$linuxPath\""
-    
-    # 3. Pipe using cmd.exe 'type' to stream raw bytes (bypasses PowerShell encoding corruption)
-    cmd.exe /c "type \"$tempFile\" | ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost \"$linuxCmd\""
-    
-    if ($LASTEXITCODE -eq 0) {
-      Write-Output "OK"
-    } else {
-      Write-Output "FAIL"
-    }
-    Remove-Item $tempFile -Force
+$tempFile = '%s'
+$sshHost = '%s'
+$remotePath = '%s'
+
+# Replace tilde (~) with `$HOME` so it expands correctly in Bash
+$linuxPath = $remotePath -replace '^~/', "`$HOME/"
+
+# We use \" to escape the inner double quotes so ssh.exe parses them correctly
+$linuxCmd = 'mkdir -p \"$(dirname \"{0}\")\" && base64 -d > \"{0}\"' -f $linuxPath
+
+# Pipe via cmd.exe to stream raw bytes without PowerShell string-encoding corruption
+cmd.exe /c "type `"$tempFile`" | ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost `"$linuxCmd`""
+
+if ($LASTEXITCODE -eq 0) {
+  Write-Output "OK"
+} else {
+  Write-Output "FAIL"
+}
   ]], temp_file, host, remote_path)
-  
+
+  local ps_f, ps_err2 = io.open(ps_script_file, "w")
+  if not ps_f then
+    os.remove(temp_file)
+    return false, "Failed to create PS1 script: " .. (ps_err2 or "unknown error")
+  end
+  ps_f:write(ps_script)
+  ps_f:close()
+
+  -- Execute the PS1 file cleanly
   local success, stdout, stderr = wezterm.run_child_process({
     "powershell.exe",
+    "-ExecutionPolicy", "Bypass",
     "-NoProfile",
     "-NonInteractive",
-    "-Command",
-    ps_script,
+    "-File",
+    ps_script_file,
   })
-  
-  -- Cleanup temp file if it still exists (in case PowerShell failed to remove it)
-  pcall(function() os.remove(temp_file) end)
-  
+
+  -- Cleanup both temp files
+  os.remove(temp_file)
+  os.remove(ps_script_file)
+
   if not success then
     return false, "SSH transfer failed: " .. (stderr or "unknown error")
   end
-  
+
   if not stdout:match("OK") then
     return false, "Failed to decode image on remote server"
   end
-  
+
   return true, nil
 end
 
