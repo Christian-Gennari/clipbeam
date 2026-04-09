@@ -1,15 +1,14 @@
-# Clipbeam
-
 ```
-oooo   o8o              .o8                                             
-`888   `"'             "888                                             
-.ooooo.   888  oooo  oo.ooooo.   888oooo.   .ooooo.   .oooo.   ooo. .oo.  .oo.   
+          oooo   o8o              .o8                                             
+          `888   `"'             "888                                             
+ .ooooo.   888  oooo  oo.ooooo.   888oooo.   .ooooo.   .oooo.   ooo. .oo.  .oo.   
 d88' `"Y8  888  `888   888' `88b  d88' `88b d88' `88b `P  )88b  `888P"Y88bP"Y88b  
 888        888   888   888   888  888   888 888ooo888  .oP"888   888   888   888  
 888   .o8  888   888   888   888  888   888 888    .o d8(  888   888   888   888  
 `Y8bod8P' o888o o888o  888bod8P'  `Y8bod8P' `Y8bod8P' `Y888""8o o888o o888o o888o 
                        888                                                        
-                      o888o
+                      o888o                                                       
+                                                                                  
 ```
 
 [![WezTerm Plugin](https://img.shields.io/badge/WezTerm-Plugin-purple)](https://wezfurlong.org/wezterm/)
