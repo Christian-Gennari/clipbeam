@@ -9,7 +9,7 @@ Clipbeam is a WezTerm plugin that lets you instantly upload screenshots to a rem
 **The workflow:**
 1. Take a screenshot with `Win+Shift+S`
 2. Press `Ctrl+Shift+I` in WezTerm
-3. Image appears on your remote server at `/tmp/paste_img.png`
+3. Image appears on your remote server at `~/.clipbeam/paste.png`
 
 ## Installation
 
@@ -41,7 +41,7 @@ After installation:
 1. Take a screenshot with `Win+Shift+S` (snipping tool)
 2. Switch to WezTerm
 3. Press `Ctrl+Shift+I`
-4. The image is uploaded and the remote path (`/tmp/paste_img.png`) is typed into your terminal
+4. The image is uploaded and the remote path (`~/.clipbeam/paste.png`) is typed into your terminal
 
 ## Uninstallation
 
@@ -87,7 +87,7 @@ Zero dependencies on the remote server — just needs the standard `base64` util
 
 The installer auto-configures sensible defaults:
 
-- **Remote path:** `/tmp/paste_img.png`
+- **Remote path:** `~/.clipbeam/paste.png`
 - **Max dimension:** 3840 pixels (4K)
 - **Keybinding:** `Ctrl+Shift+I`
 
@@ -140,9 +140,9 @@ Take a screenshot first with `Win+Shift+S` before pressing `Ctrl+Shift+I`
 
 ### Image not appearing on remote
 
-Check the remote path exists and you have write permissions:
+Check the remote directory exists and you have write permissions:
 ```bash
-ls -la /tmp/
+ls -la ~/.clipbeam/
 ```
 
 ## Building from Source

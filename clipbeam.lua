@@ -9,7 +9,7 @@
 --   local keybinding = clipbeam.setup({
 --     host = "dev@omenhub",  -- required: SSH destination (user@host or alias)
 --     max_dimension = 3840,   -- optional: max width/height (default: 3840 = 4K)
---     remote_path = "/tmp/paste_img.png", -- optional: where to save (default: /tmp/paste_img.png)
+--     remote_path = "~/.clipbeam/paste.png", -- optional: where to save (default: ~/.clipbeam/paste.png)
 --     copy_file_path = true,   -- optional: auto-paste path after upload (default: true)
 --     notify_on_success = false, -- optional: show toast on success (default: false)
 --   })
@@ -22,7 +22,7 @@ local M = {}
 -- Default configuration
 local DEFAULT_CONFIG = {
   max_dimension = 3840,
-  remote_path = "/tmp/paste_img.png",
+  remote_path = "~/.clipbeam/paste.png",
   copy_file_path = true,
   notify_on_success = false,
 }
@@ -99,27 +99,61 @@ local function capture_clipboard_base64(max_dimension)
   return base64_data, nil
 end
 
--- Transfer image to remote server via SSH and decode it
+-- Transfer image to remote server via SSH using temp file to avoid command line length limits
 local function transfer_to_remote(host, remote_path, base64_data)
-  local ssh_cmd = {
-    "ssh",
-    "-q",
-    "-o", "BatchMode=yes",
-    "-o", "ConnectTimeout=10",
-    host,
-    "echo '" .. base64_data .. "' | base64 -d > " .. remote_path .. " 2>/dev/null && echo 'OK' || echo 'FAIL'",
-  }
-
-  local success, stdout, stderr = wezterm.run_child_process(ssh_cmd)
-
+  -- Generate temp file path
+  local temp_dir = os.getenv("TEMP") or os.getenv("TMP") or "/tmp"
+  local temp_file = temp_dir .. "/clipbeam_" .. tostring(os.time()) .. ".b64"
+  
+  -- Write base64 data to temp file
+  local f, err = io.open(temp_file, "w")
+  if not f then
+    return false, "Failed to create temp file: " .. (err or "unknown error")
+  end
+  f:write(base64_data)
+  f:close()
+  
+  -- Use PowerShell to pipe file content through SSH (avoids command line length limits)
+  local ps_script = string.format([[
+    $tempFile = "%s"
+    $sshHost = "%s"
+    $remotePath = "%s"
+    
+    # Create remote directory if needed
+    $dir = Split-Path $remotePath -Parent
+    if ($dir -and $dir -ne ".") {
+      ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost "mkdir -p '$dir'" 2>$null
+    }
+    
+    # Pipe file content through SSH to decode
+    Get-Content -Raw $tempFile | ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost "base64 -d > '$remotePath'" 2>$null
+    if ($LASTEXITCODE -eq 0) {
+      Write-Output "OK"
+    } else {
+      Write-Output "FAIL"
+    }
+    Remove-Item $tempFile -Force
+  ]], temp_file, host, remote_path)
+  
+  local success, stdout, stderr = wezterm.run_child_process({
+    "powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    ps_script,
+  })
+  
+  -- Cleanup temp file if it still exists (in case PowerShell failed to remove it)
+  os.remove(temp_file)
+  
   if not success then
     return false, "SSH transfer failed: " .. (stderr or "unknown error")
   end
-
+  
   if not stdout:match("OK") then
     return false, "Failed to decode image on remote server"
   end
-
+  
   return true, nil
 end
 

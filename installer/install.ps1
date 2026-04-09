@@ -4,7 +4,7 @@
 
 param(
     [string]$SshHost,
-    [string]$RemotePath = "/tmp/paste_img.png",
+    [string]$RemotePath = "~/.clipbeam/paste.png",
     [int]$MaxDimension = 3840,
     [switch]$Silent
 )
