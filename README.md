@@ -20,8 +20,6 @@ d88' `"Y8  888  `888   888' `88b  d88' `88b d88' `88b `P  )88b  `888P"Y88bP"Y88b
 
 Beam clipboard screenshots from Windows straight to your remote Linux servers. No file saving, no SCP commands, no context switching — just snap, beam, done.
 
----
-
 ## 3-Second Workflow
 
 ```
@@ -36,11 +34,11 @@ Beam clipboard screenshots from Windows straight to your remote Linux servers. N
 
 ---
 
-## Why Clipbeam?
+## Why clipbeam?
 
 You're SSH'd into a remote Linux server and need to share a screenshot. Here's what that usually looks like:
 
-| Without Clipbeam | With Clipbeam |
+| Without clipbeam | With clipbeam |
 |------------------|---------------|
 | 1. Save screenshot to disk | 1. Screenshot (Win+Shift+S) |
 | 2. Open file manager | 2. Press Ctrl+Shift+I |
@@ -49,7 +47,7 @@ You're SSH'd into a remote Linux server and need to share a screenshot. Here's w
 | 5. Transfer to server | |
 | 6. Type the path manually | |
 
-**Clipbeam eliminates 5 steps.** Perfect for:
+**clipbeam eliminates 5 steps.** Perfect for:
 
 - Remote development on Linux servers
 - Debugging sessions requiring visual context  
@@ -95,7 +93,7 @@ installer\install.bat -SshHost "user@myserver" -Silent
 
 ## Features vs Alternatives
 
-| Feature | Clipbeam | Manual SCP | Cloud Uploads |
+| Feature | clipbeam | Manual SCP | Cloud Uploads |
 |---------|----------|------------|----------------|
 | **Steps to share screenshot** | 2 | 6+ | 5+ |
 | **Works through SSH tunnels** | Yes | Manual | No |
@@ -105,7 +103,7 @@ installer\install.bat -SshHost "user@myserver" -Silent
 | **Native to terminal workflow** | Yes | No | No |
 | **Privacy (no third-party)** | Yes | Yes | Uploads to cloud |
 
-**Bottom line:** If you live in WezTerm and SSH into remote servers, Clipbeam is built for you.
+**Bottom line:** If you live in WezTerm and SSH into remote servers, clipbeam is built for you.
 
 ---
 
@@ -252,11 +250,11 @@ max_dimension = 1920  -- Full HD max
 
 ## Uninstallation
 
-To completely remove Clipbeam:
+To completely remove clipbeam:
 
 1. Double-click `installer/uninstall.bat`
 2. The uninstaller will:
-   - Remove Clipbeam code from your WezTerm config
+   - Remove clipbeam code from your WezTerm config
    - Delete plugin files
    - Offer to restore from backup
 
@@ -317,4 +315,4 @@ See [LICENSE](LICENSE) file for details.
 
 Built for developers who need seamless image sharing between Windows workstations and remote Linux development servers.
 
-**If Clipbeam saves you time, please star this repo!**
+**If clipbeam saves you time, please star this repo!**
