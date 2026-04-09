@@ -125,8 +125,8 @@ function Install-PluginFiles {
         exit 1
     }
     
-    Copy-Item $sourcePath "$PluginDir\$PluginName.lua" -Force
-    Write-Status "Installed clipbeam.lua to $PluginDir" "success"
+    Copy-Item $sourcePath "$PluginDir\init.lua" -Force
+    Write-Status "Installed plugin as init.lua in $PluginDir" "success"
 }
 
 function Add-ClipbeamToConfig($configPath, $sshHost, $remotePath, $maxDim) {
