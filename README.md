@@ -109,6 +109,29 @@ if clipbeam_keybinding then
 end
 ```
 
+### Configuring opencode.json Permissions
+
+To allow opencode TUI to read and display images from `~/.clipbeam/paste.png`, add the following permission to your `opencode.json` settings file:
+
+```json
+{
+  "permission": {
+    "external_directory": {
+      "~/.clipbeam/**": "allow"
+    }
+  }
+}
+```
+
+**Where to add this:**
+- The `opencode.json` file is typically located at `~/.config/opencode/opencode.json`
+- If the file doesn't exist, create it in that location
+
+**What this does:**
+- Grants opencode read access to the clipbeam directory
+- Allows viewing screenshots with `@~/.clipbeam/paste.png` references
+- Essential for seamless image sharing in AI conversations
+
 ## Project Structure
 
 ```
