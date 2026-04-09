@@ -113,26 +113,39 @@ local function transfer_to_remote(host, remote_path, base64_data)
   f:write(base64_data)
   f:close()
   
-  -- Use PowerShell to pipe file content through SSH (avoids command line length limits)
+  -- Step 1: Create remote directory using SSH
+  local mkdir_cmd = {
+    "ssh",
+    "-q",
+    "-o", "BatchMode=yes",
+    "-o", "ConnectTimeout=10",
+    host,
+    "mkdir -p ~/.clipbeam"
+  }
+  
+  wezterm.run_child_process(mkdir_cmd) -- Don't check result, directory might already exist
+  
+  -- Step 2: Use PowerShell to pipe file content through SSH
+  -- This avoids Windows command line length limits
   local ps_script = string.format([[
     $tempFile = "%s"
     $sshHost = "%s"
     $remotePath = "%s"
     
-    # Create remote directory if needed
-    $dir = Split-Path $remotePath -Parent
-    if ($dir -and $dir -ne ".") {
-      ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost "mkdir -p '$dir'" 2>$null
-    }
+    # Pipe file content through SSH stdin to decode on remote
+    $content = Get-Content -Raw $tempFile
+    $result = $content | ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost "cat | base64 -d > '$remotePath'"
+    $sshExit = $LASTEXITCODE
     
-    # Pipe file content through SSH to decode
-    Get-Content -Raw $tempFile | ssh -q -o BatchMode=yes -o ConnectTimeout=10 $sshHost "base64 -d > '$remotePath'" 2>$null
-    if ($LASTEXITCODE -eq 0) {
-      Write-Output "OK"
+    # Cleanup
+    Remove-Item $tempFile -Force -ErrorAction SilentlyContinue
+    
+    # Return result
+    if ($sshExit -eq 0) {
+      "OK"
     } else {
-      Write-Output "FAIL"
+      "FAIL:$sshExit"
     }
-    Remove-Item $tempFile -Force
   ]], temp_file, host, remote_path)
   
   local success, stdout, stderr = wezterm.run_child_process({
@@ -144,14 +157,20 @@ local function transfer_to_remote(host, remote_path, base64_data)
   })
   
   -- Cleanup temp file if it still exists (in case PowerShell failed to remove it)
-  os.remove(temp_file)
+  pcall(function() os.remove(temp_file) end)
   
   if not success then
     return false, "SSH transfer failed: " .. (stderr or "unknown error")
   end
   
+  -- Check for specific exit code in output
+  if stdout:match("FAIL:(%d+)") then
+    local exitCode = stdout:match("FAIL:(%d+)")
+    return false, "SSH decode failed (exit code: " .. exitCode .. ")"
+  end
+  
   if not stdout:match("OK") then
-    return false, "Failed to decode image on remote server"
+    return false, "SSH transfer failed - no confirmation received"
   end
   
   return true, nil
