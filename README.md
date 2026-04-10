@@ -21,7 +21,7 @@ d88' `"Y8  888  `888   888' `88b  d88' `88b d88' `88b `P  )88b  `888P"Y88bP"Y88b
 Beam clipboard screenshots from Windows straight to your remote Linux servers. No file saving, no SCP commands, no context switching — just snap, beam, done.
 
 ## 3-Second Workflow
-
+<pre style="white-space: pre; font-family: monospace; line-height: 1.2;">
 ```
 ┌─────────────┐     ┌─────────────┐     ┌──────────────────────┐
 │ Screenshot  │ ──► │ Paste in    │ ──► │ Image on remote      │
@@ -29,7 +29,7 @@ Beam clipboard screenshots from Windows straight to your remote Linux servers. N
 └─────────────┘     │ Ctrl+Shift+I│     └──────────────────────┘
                     └─────────────┘
 ```
-
+</pre>
 **That's it.** Your screenshot is now on your remote server, ready to use.
 
 ---
