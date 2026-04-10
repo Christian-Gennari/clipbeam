@@ -20,6 +20,17 @@ d88' `"Y8  888  `888   888' `88b  d88' `88b d88' `88b `P  )88b  `888P"Y88bP"Y88b
 
 Beam clipboard screenshots from Windows straight to your remote Linux servers. No file saving, no SCP commands, no context switching — just snap, beam, done.
 
+> ⚠️ **PREREQUISITE: SSH Key Authentication Required**
+>
+> **clipbeam will NOT work** without passwordless SSH access configured. You must set up SSH key authentication before using this tool.
+>
+> Run this once to configure:
+> ```bash
+> ssh-copy-id user@hostname
+> ```
+>
+> [See Troubleshooting → SSH transfer failed](#ssh-transfer-failed) for more details.
+
 ## 3-Second Workflow
 <pre style="white-space: pre; font-family: monospace; line-height: 1.2;">
 ```
@@ -71,6 +82,11 @@ You're SSH'd into a remote Linux server and need to share a screenshot. Here's w
 ---
 
 ## Quick Install (Recommended)
+
+**Prerequisite:** Ensure passwordless SSH is configured (run once):
+```bash
+ssh-copy-id user@hostname
+```
 
 1. Download and extract the [latest release](../../releases/latest)
 2. Double-click `installer/install.bat`
