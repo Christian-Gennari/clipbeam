@@ -29,7 +29,6 @@ Beam clipboard screenshots from Windows straight to your remote Linux servers. N
 > ssh-copy-id user@hostname
 > ```
 >
-> [See Troubleshooting → SSH transfer failed](#ssh-transfer-failed) for more details.
 
 ## 3-Second Workflow
 <pre style="white-space: pre; font-family: monospace; line-height: 1.2;">
@@ -88,45 +87,7 @@ You're SSH'd into a remote Linux server and need to share a screenshot. Here's w
 - Incident response and server monitoring
 - Technical support and bug reports
 
----
-
-## Features vs Alternatives
-
-| Feature | clipbeam | Manual SCP | Cloud Uploads |
-|---------|----------|------------|----------------|
-| **Steps to share screenshot** | 2 | 6+ | 5+ |
-| **Works through SSH tunnels** | Yes | Manual | No |
-| **Zero remote dependencies** | Yes (just `base64`) | Yes | Requires browser/app |
-| **Auto-resize large images** | Yes (4K→reasonable) | No | Varies |
-| **Types path into terminal** | Yes | No | No |
-| **Native to terminal workflow** | Yes | No | No |
-| **Privacy (no third-party)** | Yes | Yes | Uploads to cloud |
-
 **Bottom line:** If you live in WezTerm and SSH into remote servers, clipbeam is built for you.
-
----
-
-## Use Cases
-
-### Remote Development
-
-You're coding on a remote Linux server via SSH. A teammate asks about a UI bug. Screenshot your local Windows screen, beam it to the server, paste the path into Slack — all without leaving your terminal.
-
-### Debugging Sessions
-
-Debugging a server issue and need to share logs or error states? Screenshot the error, upload instantly, reference the image in your incident channel or documentation.
-
-### Technical Documentation
-
-Creating a deployment guide or runbook? Screenshot each step on Windows, beam to your documentation server, include the images directly in your markdown.
-
-### Incident Response
-
-Monitoring dashboard shows an anomaly? Screenshot it, instantly share the image to your incident response server for team analysis.
-
-### Technical Support
-
-Helping a colleague with a remote server issue? Visual context without the back-and-forth of "can you describe what you see?"
 
 ---
 
@@ -262,23 +223,6 @@ To completely remove clipbeam:
 ```batch
 installer\uninstall.bat -Silent
 ```
-
----
-
-## Project Structure
-
-```
-clipbeam/
-├── clipbeam.lua          # The WezTerm plugin (source of truth)
-├── installer/
-│   ├── install.bat       # Double-click to install
-│   ├── install.ps1       # Installation logic
-│   ├── uninstall.bat     # Double-click to uninstall
-│   └── uninstall.ps1     # Uninstallation logic
-├── LICENSE
-└── README.md             # This file
-```
-
 ---
 
 ## Roadmap
