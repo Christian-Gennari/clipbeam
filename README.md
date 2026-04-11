@@ -33,51 +33,13 @@ Beam clipboard screenshots from Windows straight to your remote Linux servers. N
 
 ## 3-Second Workflow
 <pre style="white-space: pre; font-family: monospace; line-height: 1.2;">
-```
 ┌─────────────┐     ┌─────────────┐     ┌──────────────────────┐
 │ Screenshot  │ ──► │ Paste in    │ ──► │ Image on remote      │
 │ Win+Shift+S │     │ WezTerm     │     │ ~/.clipbeam/paste.png│
 └─────────────┘     │ Ctrl+Shift+I│     └──────────────────────┘
                     └─────────────┘
-```
 </pre>
 **That's it.** Your screenshot is now on your remote server, ready to use.
-
----
-
-## Why clipbeam?
-
-You're SSH'd into a remote Linux server and need to share a screenshot. Here's what that usually looks like:
-
-| Without clipbeam | With clipbeam |
-|------------------|---------------|
-| 1. Save screenshot to disk | 1. Screenshot (Win+Shift+S) |
-| 2. Open file manager | 2. Press Ctrl+Shift+I |
-| 3. Find the file | **Done** |
-| 4. Open SCP client or drag to upload service | |
-| 5. Transfer to server | |
-| 6. Type the path manually | |
-
-**clipbeam eliminates 5 steps.** Perfect for:
-
-- Remote development on Linux servers
-- Debugging sessions requiring visual context  
-- Technical documentation and tutorials
-- Incident response and server monitoring
-- Technical support and bug reports
-
----
-
-## Visual Demo
-
-> **Demo GIF coming soon**
->
-> Want to see it in action? Here's what happens:
-> 1. User presses `Win+Shift+S` and selects an area
-> 2. User switches to WezTerm and presses `Ctrl+Shift+I`
-> 3. A toast notification confirms the upload
-> 4. The remote path `~/.clipbeam/paste.png` appears in the terminal
-> 5. User can immediately reference the image in commands
 
 ---
 
@@ -104,6 +66,27 @@ The installer will:
 ```batch
 installer\install.bat -SshHost "user@myserver" -Silent
 ```
+
+## Why clipbeam?
+
+You're SSH'd into a remote Linux server and need to share a screenshot. Here's what that usually looks like:
+
+| Without clipbeam | With clipbeam |
+|------------------|---------------|
+| 1. Save screenshot to disk | 1. Screenshot (Win+Shift+S) |
+| 2. Open file manager | 2. Press Ctrl+Shift+I |
+| 3. Find the file | **Done** |
+| 4. Open SCP client or drag to upload service | |
+| 5. Transfer to server | |
+| 6. Type the path manually | |
+
+**clipbeam eliminates 5 steps.** Perfect for:
+
+- Remote development on Linux servers
+- Debugging sessions requiring visual context  
+- Technical documentation and tutorials
+- Incident response and server monitoring
+- Technical support and bug reports
 
 ---
 
